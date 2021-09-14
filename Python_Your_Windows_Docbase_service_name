@@ -1,0 +1,36 @@
+#Python Script to Check if Windows Service is found|installed,stopped|running without pywin32
+#Author : 
+
+import smtplib 
+import psutil
+
+host = "Your_SMTP_Server_name"
+server = smtplib.SMTP(host)
+FROM = "Your_email_id"
+TO = ['email_id_here']
+#For multiple people in TO field, use the below format
+#TO = ['emailid1', 'email_id2']
+
+def getService(name):
+    service = None
+    try:
+        service = psutil.win_service_get(name)
+        service = service.as_dict()
+    except Exception as ex:
+        print(str(ex))
+    return service
+service = getService('Your_Windows_Docbase_service_name')
+print(service)
+MSG = "Subject: Python Service Checker for CMS - \n\n The Your_Windows_Docbase_service_name (Documentum Repostiory Service) on CMS Development environment is not running! \n \n" + str(service)
+if service:
+    print("service found")
+else:
+    print("service not found")
+
+if service and service['status']== 'running':
+    print("The Your_Windows_Docbase_service_name (Documentum Repository Service) service on CMS Development environment is running\n"+ str(service))
+else:
+    print("On CMS Development environment the following service is not running \n\n"  + str(service))
+    server.sendmail(FROM, TO, MSG)
+    server.quit()
+    print ("\n\nEmail Sent")
